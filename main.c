@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "lojoc4r.h"
 
@@ -12,6 +13,9 @@ int main(){
   int guanyarr=0;
 
   int torn=0;
+
+  // Inicialitza la llavor de l'aleatori només una vegada
+  srand((unsigned)time(NULL));
 
   inicialitzacio(&t);
   for(int i=0; i<N*N; i++){

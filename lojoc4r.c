@@ -1,5 +1,3 @@
-// codi de lo joc en si
-
 #include "lojoc4r.h"
 #include "lominimax.h"
 
@@ -34,11 +32,21 @@ void preguntem(Tauler *t, int torn){ //treure int torn
   if(t->qui_juga==1){
     printf("\njugadora 1 (X) en quina columna vols tirar? ");
 
-    scanf("%d", &t->columna); // Llegim un enter de la terminal
+    if(scanf("%d", &t->columna) != 1){
+      // entrada invàlida: descartar i tornar a demanar
+      int c;
+      while((c = getchar()) != '\n' && c != EOF) ;
+      printf("\n Entrada invàlida. Torna-ho a provar.\n");
+      preguntem(t, torn);
+      return;
+    }
+
     t->columna--;
-    if( (t->columna) < 0 || (t->columna) > N){
+    // Validació: columna ha d'estar a [0, N-1]
+    if( (t->columna) < 0 || (t->columna) >= N){
       printf("\n  Aquesta columna no és vàlida !!!!!\n");
       preguntem(t, torn);
+      return;
     }
 
     //mirem quina és la fila lliure de la columna
@@ -51,6 +59,7 @@ void preguntem(Tauler *t, int torn){ //treure int torn
     if(t->fila==-1){
       printf("\n  Aquesta columna està plena, tria'n una altra !!!!!\n");
       preguntem(t, torn);
+      return;
     }
   }
   if(t->qui_juga==2){
