@@ -2,6 +2,7 @@
 #include "lojoc4r.h"
 #include "lominimax.h"
 
+
 void copiaTauler(char taula1[N+1][N+1], char taula2[N+1][N+1]){
   for(int i=0; i<N+1; i++){
     for(int j=0; j<N+1; j++){
@@ -19,6 +20,7 @@ void inicialitzacionode(Node* arrel){
 }
 
 void crearArbreRec( Node* pare, int nivell_actual){
+  
   reservarespai(pare);
   creaNivell(pare);
     for (int i = 0; i < pare->n_fills; i++) {
@@ -83,24 +85,28 @@ void crearArbreRec( Node* pare, int nivell_actual){
         p->taula[fila][col] = 'X';
       }
     }
-      void quinacolumnaes(Node* p, int numDeFill){
-        int col = numDeFill-1;
-        int jcol = 0;
+void quinacolumnaes(Node* p, int numDeFill) {
+    int columnes[N];
+    int n_columnes = 0;
 
-        while (jcol < col+1) {
-            int ifil;
-            for (ifil = N - 1; ifil >= 0; ifil--) {
-                if (p->taula[ifil][jcol] == '.') {
-                    break;
-                }
+    // Recollim les columnes no plenes
+    for (int j = 0; j < N; j++) {
+        for (int i = N-1; i >= 0; i--) {
+            if (p->taula[i][j] == '.') {
+                columnes[n_columnes++] = j;
+                break;
             }
-            if (ifil == -1) {     // la columna jcol està plena
-                col++;
-            }
-            jcol++;
         }
-        p->columna=col;
-      }
+    }
+
+    // Si numDeFill és més gran que el nombre de columnes no plenes, això és un error.
+    if (numDeFill > n_columnes) {
+        // Tractament d'error: per exemple, triar la primera columna no plena?
+        p->columna = columnes[0];
+    } else {
+        p->columna = columnes[numDeFill-1];
+    }
+}
 
 int funcioheuristica(Node* arrel){
   int gg=guanyar(arrel->taula,"XXXX","OOOO");
@@ -166,8 +172,23 @@ int assignovalors(Node *arrel, int maximitzo){
   }
   return 0;
 }
-
-int buscoquinacolumnaes(Node* arrel, int valorfinal ){
+int buscoquinacolumnaes(Node* arrel, int valorfinal){
+  // Si totes les jugades perden, triem la que fa que el joc duri més temps
+  if(valorfinal == -1000){
+    int max_fills = -1;
+    int millor_columna = 0;
+    
+    for(int i=0 ; i<arrel->n_fills ; i++) {
+        // Comptem quants fills té aquesta jugada (més fills = més opcions = joc més llarg)
+        if(arrel->fills[i]->n_fills > max_fills){
+            max_fills = arrel->fills[i]->n_fills;
+            millor_columna = arrel->fills[i]->columna;
+        }
+    }
+    return millor_columna;
+  }
+  
+  // Comportament normal
   for(int i=0 ; i<arrel->n_fills ; i++) {
       if(arrel->fills[i]->valor==valorfinal){
         return arrel->fills[i]->columna;

@@ -1,41 +1,38 @@
 #include "lojoc4r.h"
 #include "lominimax.h"
+#include <time.h>
 
 // nivell imparell és O    (p->nivell%2)
 // nivell parell és X    (p->nivell%2==0)
-
 int mainminimax(Tauler *t){
-  printf("\n\nhola\n" );
-  // ara tenim un tauler t, per manipular-lo el copiem en un node
-  // creo el node
-  Node *arrel= malloc(sizeof(Node));
-  // i el copio
-  copiaTauler(arrel->taula,t->taula);
-  // i l'inicialitzo amb tot zeros
+  srand(time(NULL));  // Inicialitza random
+  printf("\n=== INICI MINIMAX ===\n");
+  
+  // Depuració: mostra l'estat actual del tauler
+  printf("Tauler actual:\n");
+  for(int i = 0; i < N; i++){
+    for(int j = 0; j < N; j++){
+      printf("%c ", t->taula[i][j]);
+    }
+    printf("\n");
+  }
+  
+  Node *arrel = malloc(sizeof(Node));
+  copiaTauler(arrel->taula, t->taula);
   inicialitzacionode(arrel);
-  // creo tots els fills
+  
+  printf("Creant arbre...\n");
   crearArbreRec(arrel, 1);
-  // l'arrel està a nivell 0
-
-  int valorfinal= assignovalors(arrel, 0);
-
-  printf("Lo valor final serà: %d\n", valorfinal);
-  // arrel,0  -> significa que començo maximitzant
-  // és a dir que volem que guanyen les O i perdin les X
-
-  int col=buscoquinacolumnaes(arrel, valorfinal );
-  printf("LA columna és: %d\n\n", col+1);
-
-  // aquest només imprimeix
-  FILE *fp;
-  // Obrim el fitxer en mode "w" (escriptura, sobreescriu)
-  fp = fopen("arbre.txt", "w");
-  recorreArbreRecfetProfe(arrel,fp);
-  fclose(fp);
-
+  
+  printf("Assignant valors...\n");
+  int valorfinal = assignovalors(arrel, 0);
+  printf("Valor final: %d\n", valorfinal);
+  
+  int col = buscoquinacolumnaes(arrel, valorfinal);
+  printf("Columna triada: %d\n", col+1);
+  
   alliberarEspai(arrel);
-
+  printf("=== FI MINIMAX ===\n\n");
+  
   return col;
-
-
 }
